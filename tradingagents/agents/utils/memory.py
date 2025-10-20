@@ -1,3 +1,5 @@
+import os
+import requests
 import chromadb
 from chromadb.config import Settings
 from openai import OpenAI
@@ -5,21 +7,74 @@ from openai import OpenAI
 
 class FinancialSituationMemory:
     def __init__(self, name, config):
-        if config["backend_url"] == "http://localhost:11434/v1":
+        # Allow config to override embedding model, otherwise use defaults
+        self.provider = (config.get("llm_provider") or "openai").lower()
+
+        if "embedding_model" in config and config["embedding_model"]:
+            self.embedding = config["embedding_model"]
+        elif self.provider == "ollama" or config.get("backend_url") == "http://localhost:11434/v1":
+            # Default for Ollama: nomic-embed-text
+            # Note: Make sure to run 'ollama pull nomic-embed-text' first
             self.embedding = "nomic-embed-text"
+        elif self.provider == "google":
+            # Default for Google Generative AI embeddings
+            self.embedding = "text-embedding-004"
         else:
+            # Default for OpenAI/other providers
             self.embedding = "text-embedding-3-small"
-        self.client = OpenAI(base_url=config["backend_url"])
+
+        # Only initialize OpenAI-compatible client when not using Google for embeddings
+        self.client = None if self.provider == "google" else OpenAI(base_url=config["backend_url"])
         self.chroma_client = chromadb.Client(Settings(allow_reset=True))
         self.situation_collection = self.chroma_client.create_collection(name=name)
 
     def get_embedding(self, text):
         """Get OpenAI embedding for a text"""
+        if self.provider == "google":
+            return self._get_google_embedding(text)
         
-        response = self.client.embeddings.create(
-            model=self.embedding, input=text
-        )
+        response = self.client.embeddings.create(model=self.embedding, input=text)
         return response.data[0].embedding
+
+    def _get_google_embedding(self, text):
+        """Get an embedding from Google's Generative Language API.
+
+        Requires the environment variable `GOOGLE_API_KEY` to be set.
+        Uses model `text-embedding-004` by default (override via config['embedding_model']).
+        """
+        api_key = os.getenv("GOOGLE_API_KEY")
+        if not api_key:
+            raise RuntimeError(
+                "GOOGLE_API_KEY is not set. Please export GOOGLE_API_KEY to use Google embeddings."
+            )
+
+        url = f"https://generativelanguage.googleapis.com/v1/models/{self.embedding}:embedContent"
+        headers = {
+            "Content-Type": "application/json",
+            "x-goog-api-key": api_key,
+        }
+        payload = {
+            "content": {
+                "parts": [
+                    {"text": text}
+                ]
+            }
+        }
+
+        resp = requests.post(url, headers=headers, json=payload, timeout=30)
+        if not resp.ok:
+            # Truncate response text to avoid overly long messages
+            snippet = resp.text[:300]
+            raise RuntimeError(f"Google embeddings error {resp.status_code}: {snippet}")
+
+        data = resp.json()
+        embedding = (
+            data.get("embedding", {}).get("values")
+            or data.get("embedding", {}).get("value")
+        )
+        if embedding is None:
+            raise RuntimeError("Unexpected Google embeddings response shape")
+        return embedding
 
     def add_situations(self, situations_and_advice):
         """Add financial situations and their corresponding advice. Parameter is a list of tuples (situation, rec)"""

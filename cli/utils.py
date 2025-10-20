@@ -123,7 +123,13 @@ def select_research_depth() -> int:
 
 
 def select_shallow_thinking_agent(provider) -> str:
-    """Select shallow thinking llm engine using an interactive selection."""
+    """Select shallow thinking llm engine using an interactive selection.
+
+    IMPORTANT: For Ollama models, only models with function calling/tool support are listed.
+    The TradingAgents framework requires tool calling for all analyst agents (Market, News,
+    Social, Fundamentals) to fetch data. Models without tool support will fail with:
+    "does not support tools" error.
+    """
 
     # Define shallow thinking llm engine options with their corresponding model names
     SHALLOW_AGENT_OPTIONS = {
@@ -150,8 +156,14 @@ def select_shallow_thinking_agent(provider) -> str:
             ("google/gemini-2.0-flash-exp:free - Gemini Flash 2.0 offers a significantly faster time to first token", "google/gemini-2.0-flash-exp:free"),
         ],
         "ollama": [
-            ("llama3.1 local", "llama3.1"),
-            ("llama3.2 local", "llama3.2"),
+            # Note: Only models with function calling support are listed
+            ("Llama 3.1 8B - Supports function calling", "llama3.1:8b"),
+            ("Llama 3.1 70B - Supports function calling (requires more RAM)", "llama3.1:70b"),
+            ("Llama 3.2 1B - Ultra lightweight with function calling", "llama3.2:1b"),
+            ("Llama 3.2 3B - Lightweight with function calling", "llama3.2:3b"),
+            ("GPT-OSS 20B - OpenAI's open-weight model with excellent function calling", "gpt-oss:20b"),
+            ("Mistral - Supports function calling", "mistral:latest"),
+            ("Qwen 2.5 - Supports function calling", "qwen2.5:latest"),
         ]
     }
 
@@ -181,7 +193,13 @@ def select_shallow_thinking_agent(provider) -> str:
 
 
 def select_deep_thinking_agent(provider) -> str:
-    """Select deep thinking llm engine using an interactive selection."""
+    """Select deep thinking llm engine using an interactive selection.
+
+    IMPORTANT: For Ollama models, only models with function calling/tool support are listed.
+    The TradingAgents framework requires tool calling for all analyst agents (Market, News,
+    Social, Fundamentals) to fetch data. Models without tool support will fail with:
+    "does not support tools" error.
+    """
 
     # Define deep thinking llm engine options with their corresponding model names
     DEEP_AGENT_OPTIONS = {
@@ -212,8 +230,14 @@ def select_deep_thinking_agent(provider) -> str:
             ("Deepseek - latest iteration of the flagship chat model family from the DeepSeek team.", "deepseek/deepseek-chat-v3-0324:free"),
         ],
         "ollama": [
-            ("llama3.1 local", "llama3.1"),
-            ("qwen3", "qwen3"),
+            # Note: Only models with function calling support are listed
+            ("Llama 3.1 8B - Supports function calling", "llama3.1:8b"),
+            ("Llama 3.1 70B - Supports function calling (requires more RAM)", "llama3.1:70b"),
+            ("Llama 3.2 1B - Ultra lightweight with function calling", "llama3.2:1b"),
+            ("Llama 3.2 3B - Lightweight with function calling", "llama3.2:3b"),
+            ("GPT-OSS 20B - OpenAI's open-weight model with excellent reasoning & function calling", "gpt-oss:20b"),
+            ("Mistral - Supports function calling", "mistral:latest"),
+            ("Qwen 2.5 - Supports function calling and deep reasoning", "qwen2.5:latest"),
         ]
     }
     

@@ -83,6 +83,10 @@ class TradingAgentsGraph:
             self.quick_thinking_llm = ChatGoogleGenerativeAI(model=self.config["quick_think_llm"])
         else:
             raise ValueError(f"Unsupported LLM provider: {self.config['llm_provider']}")
+
+        # Validate Ollama setup if using Ollama
+        if self.config["llm_provider"].lower() == "ollama":
+            self._validate_ollama_setup()
         
         # Initialize memories
         self.bull_memory = FinancialSituationMemory("bull_memory", self.config)
@@ -255,3 +259,51 @@ class TradingAgentsGraph:
     def process_signal(self, full_signal):
         """Process a signal to extract the core decision."""
         return self.signal_processor.process_signal(full_signal)
+
+    def _validate_ollama_setup(self):
+        """Validate that required Ollama models are available."""
+        import requests
+
+        try:
+            # Check if Ollama is running
+            response = requests.get("http://localhost:11434/api/tags", timeout=2)
+            if response.status_code != 200:
+                print("\n⚠️  Warning: Cannot connect to Ollama. Make sure Ollama is running.")
+                return
+
+            models_data = response.json()
+            available_models = [model["name"] for model in models_data.get("models", [])]
+
+            # Determine which embedding model to check for
+            embedding_model = self.config.get("embedding_model") or "nomic-embed-text"
+
+            # Check for embedding model
+            embedding_found = any(embedding_model in model for model in available_models)
+
+            if not embedding_found:
+                print(f"\n{'='*70}")
+                print(f"⚠️  SETUP REQUIRED: Missing Embedding Model")
+                print(f"{'='*70}")
+                print(f"\nThe embedding model '{embedding_model}' is not installed.")
+                print(f"This model is required for memory/RAG functionality used by:")
+                print(f"  • Bull Researcher")
+                print(f"  • Bear Researcher")
+                print(f"  • Trader")
+                print(f"  • Research Manager")
+                print(f"  • Risk Manager")
+                print(f"\n📥 To fix this, run:")
+                print(f"   ollama pull {embedding_model}")
+                print(f"\n💡 For more details, see: OLLAMA_TOOL_SUPPORT.md")
+                print(f"{'='*70}\n")
+
+                # Ask user if they want to continue anyway
+                response = input("Do you want to continue anyway? (y/n): ").strip().lower()
+                if response != 'y':
+                    raise RuntimeError(f"Missing required embedding model: {embedding_model}")
+
+        except requests.exceptions.RequestException:
+            print("\n⚠️  Warning: Cannot connect to Ollama at http://localhost:11434")
+            print("Make sure Ollama is running before starting analysis.")
+        except Exception as e:
+            if self.debug:
+                print(f"\n⚠️  Warning: Could not validate Ollama setup: {e}")

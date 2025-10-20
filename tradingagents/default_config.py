@@ -13,6 +13,11 @@ DEFAULT_CONFIG = {
     "deep_think_llm": "o4-mini",
     "quick_think_llm": "gpt-4o-mini",
     "backend_url": "https://api.openai.com/v1",
+    # Embedding model for memory/RAG functionality
+    # If None, will auto-select based on provider:
+    #   - Ollama: "nomic-embed-text" (run 'ollama pull nomic-embed-text')
+    #   - OpenAI/others: "text-embedding-3-small"
+    "embedding_model": None,
     # Debate and discussion settings
     "max_debate_rounds": 1,
     "max_risk_discuss_rounds": 1,
