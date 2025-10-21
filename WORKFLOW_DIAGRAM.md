@@ -204,23 +204,23 @@ graph LR
 ## Memory System Architecture
 
 ```mermaid
-graph TB
-    subgraph "ChromaDB Collections"
-        BullMem[Bull Researcher<br/>Memory Collection]
-        BearMem[Bear Researcher<br/>Memory Collection]
-        TraderMem[Trader<br/>Memory Collection]
-        RMMem[Research Manager<br/>Memory Collection]
-        RiskMgrMem[Risk Manager<br/>Memory Collection]
+flowchart TB
+    subgraph ChromaDB Collections
+        BullMem[Bull Researcher\nMemory Collection]
+        BearMem[Bear Researcher\nMemory Collection]
+        TraderMem[Trader\nMemory Collection]
+        RMMem[Research Manager\nMemory Collection]
+        RiskMgrMem[Risk Manager\nMemory Collection]
     end
 
-    subgraph "Embedding Models"
-        OpenAIEmb[OpenAI<br/>text-embedding-ada-002]
-        OllamaEmb[Ollama<br/>nomic-embed-text]
-        GoogleEmb[Google<br/>Generative AI]
+    subgraph Embedding Models
+        OpenAIEmb[OpenAI\ntext-embedding-ada-002]
+        OllamaEmb[Ollama\nnomic-embed-text]
+        GoogleEmb[Google\nGenerative AI]
     end
 
-    subgraph "Memory Operations"
-        Store[Store Decision<br/>+ Context + Outcome]
+    subgraph Memory Operations
+        Store[Store Decision<br/>Context + Outcome]
         Query[Query Similar<br/>Situations (n=2)]
         Learn[Learn from<br/>Past Mistakes]
     end
@@ -243,9 +243,9 @@ graph TB
 
     Query --> Learn
 
-    style Store fill:#FF9800
-    style Query fill:#03A9F4
-    style Learn fill:#9C27B0
+    style Store fill:#FF9800,color:#000
+    style Query fill:#03A9F4,color:#000
+    style Learn fill:#9C27B0,color:#000
 ```
 
 ## Decision Flow with Conditional Logic
