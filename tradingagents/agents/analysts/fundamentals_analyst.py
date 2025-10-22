@@ -20,7 +20,21 @@ def create_fundamentals_analyst(llm):
 
         system_message = (
             "You are a researcher tasked with analyzing fundamental information over the past week about a company. Please write a comprehensive report of the company's fundamental information such as financial documents, company profile, basic company financials, and company financial history to gain a full view of the company's fundamental information to inform traders. Make sure to include as much detail as possible. Do not simply state the trends are mixed, provide detailed and finegrained analysis and insights that may help traders make decisions."
-            + " Make sure to append a Markdown table at the end of the report to organize key points in the report, organized and easy to read."
+            + "\n\n**Economic Moat Analysis**: As part of your fundamental analysis, conduct a thorough evaluation of the company's economic moat (sustainable competitive advantages). Assess the following:"
+            + "\n- **Moat Width**: Classify the moat as Wide (durable advantages lasting 20+ years), Narrow (advantages lasting 10+ years), or None (limited competitive advantages)"
+            + "\n- **Moat Sources**: Identify and analyze specific competitive advantages from the following categories:"
+            + "\n  * **Intangible Assets**: Brand strength, patents, regulatory licenses, proprietary technology"
+            + "\n  * **Switching Costs**: Customer lock-in due to high costs or difficulty of switching to competitors"
+            + "\n  * **Network Effects**: Product/service value increases with more users (e.g., platforms, marketplaces)"
+            + "\n  * **Cost Advantages**: Economies of scale, unique access to resources, process advantages, superior locations"
+            + "\n  * **Efficient Scale**: Operating in markets where additional competitors would be economically irrational"
+            + "\n  * **Monopolistic Profitability and Market Share Concentration**: Dominant market position leading to superior margins, pricing power, and market share concentration that creates barriers to entry"
+            + "\n  * **Dominant Ecosystem and Competitive Exclusion**: Control of critical platforms, standards, or ecosystems that create competitive barriers and exclude rivals from key markets or customer segments"
+            + "\n  * **Scalability and Asset-Light Model**: Ability to grow revenue with minimal incremental capital investment, enabling high return on invested capital and rapid expansion without proportional cost increases"
+            + "\n- **Moat Durability**: Evaluate the sustainability of these advantages over time, considering technological disruption, regulatory changes, and competitive threats"
+            + "\n- **Moat Trends**: Assess whether the moat is widening, stable, or narrowing based on recent developments"
+            + "\n- **Investment Implications**: Explain how the moat analysis impacts long-term value creation, pricing power, and investment attractiveness"
+            + "\n\nMake sure to append a Markdown table at the end of the report to organize key points in the report, organized and easy to read. The table should include a dedicated row or section for Moat Analysis summary."
             + " Use the available tools: `get_fundamentals` for comprehensive company analysis, `get_balance_sheet`, `get_cashflow`, and `get_income_statement` for specific financial statements.",
         )
 
